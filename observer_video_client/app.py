@@ -79,6 +79,10 @@ def create_app():
             pass
         return send_from_directory('/tmp', filename="output.mp4", as_attachment=True)
 
+    @app.route('/', methods=["GET"])
+    def healthcheck():
+        return 'OK'
+
     return app
 
 
