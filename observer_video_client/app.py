@@ -31,12 +31,33 @@ def start_recording():
     Popen(cmd, stderr=PIPE, stdout=PIPE).communicate()
 
 
+def restart_recording_agent():
+    cmd = ["/usr/bin/supervisorctl", "restart", "selenium-standalone"]
+    Popen(cmd, stderr=PIPE, stdout=PIPE).communicate()
+
+def terminate_supervisor():
+    cmd = ["/usr/bin/supervisorctl", "shutdown"]
+    Popen(cmd, stderr=PIPE, stdout=PIPE).communicate()
+
+
 def create_app():
     app = Flask(__name__)
     q = Queue()
     @app.teardown_appcontext
     def teardown_db(event):
         pass
+
+    @app.route("/terminate", methods=["GET"])
+    def terminate_host():
+        proc = Process(target=terminate_supervisor, args=())
+        proc.start()
+        return "Ok"
+
+    @app.route("/restart", methods=["GET"])
+    def flush():
+        proc = Process(target=restart_recording_agent, args=())
+        proc.start()
+        return "Ok"
 
     @app.route("/record/start", methods=["GET"])
     def record_screen():
